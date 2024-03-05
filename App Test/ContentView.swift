@@ -6,6 +6,8 @@ class BluetoothViewModel: NSObject, ObservableObject {
     private var centralManager: CBCentralManager?
     private var peripherals: [CBPeripheral] = []
     @Published var peripheralNames: [String] = []
+    @Published var isConnected: Bool = false // Variable for screen transition
+    
     override init (){
         super.init()
         self.centralManager = CBCentralManager(delegate: self, queue: .main)
@@ -38,7 +40,7 @@ extension BluetoothViewModel: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("Connected to peripheral: \(peripheral)")
-        
+        self.isConnected = true // Update connection status
     }
 }
 
@@ -46,15 +48,19 @@ struct ContentView: View {
     @ObservedObject private var bluetoothViewModel = BluetoothViewModel()
     
     var body: some View {
-        NavigationView {
-            List(0..<bluetoothViewModel.peripheralNames.count, id: \.self) { index in
-                Button(action: {
-                    self.bluetoothViewModel.connectToPeripheral(atIndex: index)
-                }) {
-                    Text(self.bluetoothViewModel.peripheralNames[index])
+            NavigationView {
+            if bluetoothViewModel.isConnected {
+                Text("Connected") // Display this when connected
+            } else {
+                List(0..<bluetoothViewModel.peripheralNames.count, id: \.self) { index in
+                    Button(action: {
+                        self.bluetoothViewModel.connectToPeripheral(atIndex: index)
+                    }) {
+                        Text(self.bluetoothViewModel.peripheralNames[index])
+                    }
                 }
+                .navigationTitle("Peripherals")
             }
-            .navigationTitle("Peripherals")
         }
     }
 }
