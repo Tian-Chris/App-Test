@@ -83,8 +83,12 @@ extension BluetoothViewModel: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if let data = characteristic.value {
             print("Notification Data:")
+            print(data)
+            var count = 0
             for byte in data {
+                print(count, terminator: ": ")
                 print(byte, terminator: " ")
+                count += 1
             }
         }
     }
